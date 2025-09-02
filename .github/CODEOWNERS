@@ -1,0 +1,26 @@
+# CODEOWNERS file for LLM-Kepzes repository
+# This file defines who should review code changes
+
+# Default owners for all files
+# Note: Replace with actual GitHub usernames/teams when available
+* @nkalmi83
+
+# FastAPI application files - main development area
+/05_design/ @nkalmi83
+
+# Critical configuration files requiring careful review
+/05_design/main.py @nkalmi83
+/05_design/database.py @nkalmi83
+/05_design/config.py @nkalmi83
+/05_design/pyproject.toml @nkalmi83
+
+# GitHub configuration and workflows
+/.github/ @nkalmi83
+
+# Documentation
+*.md @nkalmi83
+
+# Note: GitHub Copilot will assist with reviews through:
+# 1. Automated code quality checks in CI/CD
+# 2. Copilot chat features for manual reviews
+# 3. AI-powered suggestions during development

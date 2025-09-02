@@ -1,0 +1,68 @@
+name: AI-Powered Code Review
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
+jobs:
+  ai-code-review:
+    runs-on: ubuntu-latest
+    name: AI Code Review
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies for FastAPI app
+        run: |
+          cd 05_design
+          pip install -r <(echo "fastapi==0.116.0
+          uvicorn[standard]==0.35.0
+          sqlalchemy[asyncio]==2.0.41
+          aiosqlite==0.21.0
+          pydantic==2.11.7
+          pydantic-settings==2.10.1
+          python-dotenv==1.1.1
+          black
+          isort
+          flake8
+          pytest
+          httpx")
+
+      - name: Run code quality checks
+        run: |
+          cd 05_design
+          echo "🔍 Running code quality checks..."
+          black --check --diff . || echo "Black formatting issues found"
+          isort --check-only --diff . || echo "Import sorting issues found"
+          flake8 . || echo "Flake8 linting issues found"
+
+      - name: AI Code Review with OpenAI
+        uses: anc95/ChatGPT-CodeReview@main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        with:
+          model: gpt-4
+          review_comment_lgtm: false
+          system_message: |
+            You are an expert Python developer reviewing FastAPI code. Focus on:
+            - FastAPI best practices and async/await patterns
+            - SQLAlchemy 2.x async usage and proper session management
+            - Pydantic v2 validation and settings
+            - Security vulnerabilities
+            - Performance optimizations
+            - Code maintainability and readability
+            - Follow the project's coding standards as defined in the copilot-instructions.md
